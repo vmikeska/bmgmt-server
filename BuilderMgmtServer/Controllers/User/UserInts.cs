@@ -18,6 +18,12 @@ namespace builder_mgmt_server.Controllers.User
 
     }
 
+    public class UpdatePropRequest
+    {
+        public string item { get; set; }
+        public string value { get; set; }
+    }
+
     public class PlaceLocationResponse
     {
         public string text { get; set; }
@@ -35,5 +41,5 @@ namespace builder_mgmt_server.Controllers.User
         public PlaceLocationResponse location { get; set; }
     }
 
-    
+
 }

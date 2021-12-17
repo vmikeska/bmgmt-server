@@ -39,6 +39,19 @@ namespace builder_mgmt_server.Controllers
             return ResponseHelper.Successful(res);
         }
 
+
+        [HttpPut("prop")]
+        [AuthorizeApi]
+        public async Task<ApiResult> UpdateItem([FromBody] UpdatePropRequest req)
+        {
+            var filter = DB.F<UserEntity>().Eq(p => p.id, UserIdObj);
+            var update = DB.U<UserEntity>().Set(req.item, req.value);
+            var res = await DB.UpdateAsync(filter, update);
+            var successful = res.MatchedCount == 1;
+            
+            return ResponseHelper.Successful(successful);
+        }
+
         [HttpPut]
         [AuthorizeApi]
         public async Task<ApiResult> Update([FromBody] UserRequest req)
@@ -51,7 +64,7 @@ namespace builder_mgmt_server.Controllers
                 Desc = req.desc,
                 Mail = req.mail,
                 Phone = req.phone,
-                Website = req.website,                
+                Website = req.website,
             };
 
             if (req.location != null)
@@ -62,7 +75,7 @@ namespace builder_mgmt_server.Controllers
                     Coords = req.location.coords
                 };
             }
-            
+
             var id = await UModel.UpdateUserAsync(newUserDO);
             return ResponseHelper.Successful(true);
         }
