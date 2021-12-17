@@ -1,0 +1,1 @@
+cls & docker stop bmgmt-server-cont & docker rm bmgmt-server-cont & docker image rm bmgmt-server-image & docker build -t bmgmt-server-image . & docker run --name bmgmt-server-cont -d -p 6001:80 bmgmt-server-image & cls & docker image ls & docker container ls

@@ -1,0 +1,4 @@
+BuilderMgmtServer/obj/*
+BuilderMgmtServer/bin/*
+TestX/obj/*
+TestX/bin/*
