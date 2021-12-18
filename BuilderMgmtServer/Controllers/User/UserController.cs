@@ -28,9 +28,22 @@ namespace builder_mgmt_server.Controllers
             UModel = (UserModel)uModel;
         }
 
+        [HttpGet]
+        [AuthorizeApi]
+        public async Task<ApiResult> Get(string id)
+        {
+            var uid = new ObjectId(id);
+
+            var e = DB.FOD<UserEntity>(u => u.id == uid);
+
+            var res = UserMappings.FromEntityToRes(e);
+
+            return ResponseHelper.Successful(res);
+        }
+
         [HttpGet("me")]
         [AuthorizeApi]
-        public async Task<ApiResult> Get()
+        public async Task<ApiResult> GetMe()
         {
             var e = DB.FOD<UserEntity>(u => u.id == UserIdObj);
 
@@ -39,13 +52,33 @@ namespace builder_mgmt_server.Controllers
             return ResponseHelper.Successful(res);
         }
 
+        private Object GetPropUpdateValue(string item, string value)
+        {
+            if (item == "location")
+            {
+                var prms = value.Split("||");
+                var c1 = double.Parse(prms[1]);
+                var c2 = double.Parse(prms[2]);
+
+                return new LocationSE()
+                {
+                    text = prms[0],
+                    coords = new List<double>() { c1, c2 }
+                };
+            }
+
+            return value;
+        }
+
 
         [HttpPut("prop")]
         [AuthorizeApi]
         public async Task<ApiResult> UpdateItem([FromBody] UpdatePropRequest req)
         {
+            var value = GetPropUpdateValue(req.item, req.value);
+
             var filter = DB.F<UserEntity>().Eq(p => p.id, UserIdObj);
-            var update = DB.U<UserEntity>().Set(req.item, req.value);
+            var update = DB.U<UserEntity>().Set(req.item, value);
             var res = await DB.UpdateAsync(filter, update);
             var successful = res.MatchedCount == 1;
             
@@ -82,7 +115,7 @@ namespace builder_mgmt_server.Controllers
 
         [HttpGet("find")]
         [AuthorizeApi]
-        public async Task<ApiResult> Get(string s)
+        public async Task<ApiResult> FindUser(string s)
         {
             var ls = s != null ? s.ToLowerInvariant() : "";
 
