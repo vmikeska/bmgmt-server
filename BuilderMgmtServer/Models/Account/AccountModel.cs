@@ -42,7 +42,8 @@ namespace builder_mgmt_server.Models
             {
                 id = userId,
                 firstName = user.FirstName,
-                lastName = user.LastName
+                lastName = user.LastName,
+                mail = user.Mail
             };
 
             await DB.SaveAsync(ue);
