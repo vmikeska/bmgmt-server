@@ -134,13 +134,23 @@ namespace builder_mgmt_server.Controllers
             return ResponseHelper.Successful(e.id.ToString());
         }
 
-        [HttpPut]
+        //[HttpPut]
+        //[AuthorizeApi]
+        //public async Task<ApiResult> Update([FromBody] TaskResponse req)
+        //{
+        //    var e = await TModel.UpdateFromRequestAsync(req);
+        //    return ResponseHelper.Successful(e.id.ToString());
+        //}
+
+        [HttpPut("type")]
         [AuthorizeApi]
-        public async Task<ApiResult> Update([FromBody] TaskResponse req)
+        public async Task<ApiResult> UpdateType([FromBody] TaskDateTypeResponse req)
         {
-            var e = await TModel.UpdateFromRequestAsync(req);
-            return ResponseHelper.Successful(e.id.ToString());
+            var successful = await TModel.UpdateFromTaskTypeRequestAsync(req);
+            return ResponseHelper.Successful(successful);
         }
+
+        
 
     }
 

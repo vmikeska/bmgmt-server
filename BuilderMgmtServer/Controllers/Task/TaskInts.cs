@@ -30,25 +30,24 @@ namespace builder_mgmt_server.Controllers
         public string projName { get; set; }
     }
 
-    public class TaskResponse
+    public class TaskResponse : TaskDateTypeResponse
+    {        
+        public string ownerId { get; set; }
+        public string desc { get; set; }       
+    }
+
+    public class TaskDateTypeResponse
     {
         public string id { get; set; }
-        public string ownerId { get; set; }
-        public string desc { get; set; }
         public string name { get; set; }
-
         public string dateFrom { get; set; }
         public string dateTo { get; set; }
         public TaskTypeEnum @type { get; set; }
         public int week { get; set; }
         public int year { get; set; }
         public int month { get; set; }
-
-
         public int manHours { get; set; }
         public int manDays { get; set; }
-
-
     }
 
     public class TaskGroupsResponse

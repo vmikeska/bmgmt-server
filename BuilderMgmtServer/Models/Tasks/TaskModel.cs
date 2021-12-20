@@ -5,6 +5,7 @@ using builder_mgmt_server.Entities;
 using builder_mgmt_server.Enums;
 using builder_mgmt_server.Utils;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,52 +40,122 @@ namespace builder_mgmt_server.Models.Tasks
             return res;
         }
 
-        public async Task<TaskEntity> UpdateFromRequestAsync(TaskResponse req)
+        public async Task<bool> UpdateFromTaskTypeRequestAsync(TaskDateTypeResponse req)
         {
             var type = req.type;
             var id = new ObjectId(req.id);
 
-            var oldTask = DB.FOD<TaskEntity>(t => t.id == id);
+            var us = new List<UpdateDefinition<TaskEntity>>();
 
-            var e = new TaskEntity()
+            var filter = DB.F<TaskEntity>().Eq(p => p.id, id);
+
+            var u = DB.U<TaskEntity>();
+
+            if (!String.IsNullOrEmpty(req.name))
             {
-                id = oldTask.id,
-                owner_id = oldTask.owner_id,
+                us.Add(u.Set(p => p.name, req.name));
+            }
 
-                name = req.name,
-                type = type,
-                desc = req.desc
-            };
+            us.Add(u.Set(p => p.type, req.type));
+            us.Add(u.Set(p => p.manHours, req.manHours));
+            us.Add(u.Set(p => p.manDays, req.manDays));
+
+            DateTime? dateFrom = null;
+            DateTime? dateTo = null;
+
+            int week = 0;
+            int year = 0;
+            int month = 0;
+
+            int mid = 0;
+            int wid = 0;
 
             if (req.type != TaskTypeEnum.Unassigned)
             {
-                e.manDays = req.manDays;
-                e.manHours = req.manHours;
-
                 if (type == TaskTypeEnum.ExactFlexible || type == TaskTypeEnum.ExactStatic)
                 {
-                    e.dateFrom = DateTimeUtils.Utc(req.dateFrom);
-                    e.dateTo = DateTimeUtils.Utc(req.dateTo);
+                    dateFrom = DateTimeUtils.Utc(req.dateFrom);
+                    dateTo = DateTimeUtils.Utc(req.dateTo);
                 }
 
                 if (type == TaskTypeEnum.Month)
                 {
-                    e.month = req.month;
-                    e.year = req.year;
-                    e.mid = TaskUtils.MidFromMonth(e.year, e.month);
+                    month = req.month;
+                    year = req.year;
+                    mid = TaskUtils.MidFromMonth(year, month);
                 }
 
                 if (type == TaskTypeEnum.Week)
                 {
-                    e.week = req.week;
-                    e.year = req.year;
-                    e.wid = TaskUtils.WidFromWeek(e.year, e.week);
+                    week = req.week;
+                    year = req.year;
+                    wid = TaskUtils.WidFromWeek(year, week);
                 }
             }
 
-            var res = await DB.ReplaceOneAsync(e);
-            return e;
+            us.Add(u.Set(p => p.dateFrom, dateFrom));
+            us.Add(u.Set(p => p.dateTo, dateTo));
+
+            us.Add(u.Set(p => p.week, week));
+            us.Add(u.Set(p => p.year, year));
+            us.Add(u.Set(p => p.month, month));
+
+            us.Add(u.Set(p => p.mid, mid));
+            us.Add(u.Set(p => p.wid, wid));
+
+            var update = u.Combine(us);
+
+            var res = await DB.UpdateAsync(filter, update);
+            var successful = res.MatchedCount == 1;
+            return successful;
         }
+
+        //public async Task<TaskEntity> UpdateFromRequestAsync(TaskResponse req)
+        //{
+        //    var type = req.type;
+        //    var id = new ObjectId(req.id);
+
+        //    var oldTask = DB.FOD<TaskEntity>(t => t.id == id);
+
+        //    var e = new TaskEntity()
+        //    {
+        //        id = oldTask.id,
+        //        owner_id = oldTask.owner_id,
+
+        //        name = req.name,
+        //        type = type,
+        //        desc = req.desc
+        //    };
+
+        //    if (req.type != TaskTypeEnum.Unassigned)
+        //    {
+        //        e.manDays = req.manDays;
+        //        e.manHours = req.manHours;
+
+        //        if (type == TaskTypeEnum.ExactFlexible || type == TaskTypeEnum.ExactStatic)
+        //        {
+        //            e.dateFrom = DateTimeUtils.Utc(req.dateFrom);
+        //            e.dateTo = DateTimeUtils.Utc(req.dateTo);
+        //        }
+
+        //        if (type == TaskTypeEnum.Month)
+        //        {
+        //            e.month = req.month;
+        //            e.year = req.year;
+        //            e.mid = TaskUtils.MidFromMonth(e.year, e.month);
+        //        }
+
+        //        if (type == TaskTypeEnum.Week)
+        //        {
+        //            e.week = req.week;
+        //            e.year = req.year;
+        //            e.wid = TaskUtils.WidFromWeek(e.year, e.week);
+        //        }
+        //    }
+
+        //    var res = await DB.ReplaceOneAsync(e);
+        //    return e;
+        //}
 
         public List<TaskEntity> GetUnassignedTask()
         {
