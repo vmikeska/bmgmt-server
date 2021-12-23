@@ -138,9 +138,20 @@ namespace builder_mgmt_server.Controllers
 
         [HttpGet("list")]
         [AuthorizeApi]
-        public ApiResult GetUnassignedTasks()
+        public ApiResult GetMyProjects()
         {
             var tasks = ProjModel.GetProjectsList();
+
+            var res = tasks.Select(t => ProjectMappings.FromEntityToRes(t)).ToList();
+
+            return ResponseHelper.Successful(res);
+        }
+
+        [HttpGet("list-particip")]
+        [AuthorizeApi]
+        public ApiResult GetParticipatingProjects()
+        {
+            var tasks = ProjModel.GetParticipatingProjectsList(UserIdObj);
 
             var res = tasks.Select(t => ProjectMappings.FromEntityToRes(t)).ToList();
 

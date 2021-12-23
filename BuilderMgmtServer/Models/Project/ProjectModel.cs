@@ -87,6 +87,21 @@ namespace builder_mgmt_server.Models.Tasks
             return items;
         }
 
+        public List<ProjectEntity> GetParticipatingProjectsList(ObjectId userId)
+        {
+            var bindings = DB.List<ProjectParticipantEntity>(p => p.user_id == userId);
+
+            if (!bindings.Any())
+            {
+                return new List<ProjectEntity>();
+            }
+
+            var projIds = bindings.Select(i => i.topic_id).ToList();
+
+            var items = DB.List<ProjectEntity>(t => projIds.Contains(t.id)).ToList();
+            return items;
+        }
+
 
 
 

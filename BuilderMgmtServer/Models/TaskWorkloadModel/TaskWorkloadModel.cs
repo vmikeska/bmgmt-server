@@ -115,15 +115,18 @@ namespace builder_mgmt_server.Models
                     {
                         var day = Days.Find(d => d.Date.Equals(currentDay));
 
-                        if (TaskCommonUtils.IsDayUsed(UseDays, day.Date))
+                        if (day != null)
                         {
-                            var load = new DayLoadDO()
+                            if (TaskCommonUtils.IsDayUsed(UseDays, day.Date))
                             {
-                                TaskId = item.id,
-                                Hours = manHoursPerDay,
-                                Type = item.type
-                            };
-                            day.Loads.Add(load);
+                                var load = new DayLoadDO()
+                                {
+                                    TaskId = item.id,
+                                    Hours = manHoursPerDay,
+                                    Type = item.type
+                                };
+                                day.Loads.Add(load);
+                            }
                         }
 
                         currentDay = currentDay.AddDays(1);
@@ -141,15 +144,16 @@ namespace builder_mgmt_server.Models
                     while (currentDay <= item.dateTo)
                     {
                         var day = Days.Find(d => d.Date.Equals(currentDay));
-
-                        var load = new DayLoadDO()
+                        if (day != null)
                         {
-                            TaskId = item.id,
-                            Hours = manHoursPerDay,
-                            Type = item.type
-                        };
-                        day.Loads.Add(load);
-
+                            var load = new DayLoadDO()
+                            {
+                                TaskId = item.id,
+                                Hours = manHoursPerDay,
+                                Type = item.type
+                            };
+                            day.Loads.Add(load);
+                        }
                         currentDay = currentDay.AddDays(1);
                     }
                 }

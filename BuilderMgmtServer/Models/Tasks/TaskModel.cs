@@ -33,8 +33,35 @@ namespace builder_mgmt_server.Models.Tasks
                 id = ObjectId.GenerateNewId(),
                 owner_id = UserIdSvc.IdObj,
                 name = req.name,
-                type = TaskTypeEnum.Unassigned,
+                type = req.type,
+                manDays = req.manDays,
+                manHours = req.manHours,
+                desc = req.desc                
             };
+
+            if (req.type == TaskTypeEnum.Month)
+            {
+                e.month = req.month;
+                e.year = req.year;
+                e.mid = TaskUtils.MidFromMonth(req.year, req.month);
+            }
+
+            if (req.type == TaskTypeEnum.Week)
+            {
+                e.week = req.week;
+                e.year = req.year;
+                e.wid = TaskUtils.WidFromWeek(req.year, req.week);
+            }
+
+            if (
+                req.type == TaskTypeEnum.ExactFlexible
+                ||
+                req.type == TaskTypeEnum.ExactStatic
+                )
+            {
+                e.dateFrom = DateTimeUtils.Utc(req.dateFrom);
+                e.dateTo = DateTimeUtils.Utc(req.dateTo);
+            }
 
             var res = await DB.SaveAsync(e);
             return res;
