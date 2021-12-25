@@ -1,6 +1,9 @@
-﻿using builder_mgmt_server.Database;
+﻿using builder_mgmt_server.Controllers;
+using builder_mgmt_server.Database;
 using builder_mgmt_server.Entities;
 using builder_mgmt_server.Models.Account;
+using builder_mgmt_server.Models.Project;
+using builder_mgmt_server.Models.Tasks;
 using builder_mgmt_server.Models.TasksBusyness;
 using builder_mgmt_server.Models.User;
 using MongoDB.Bson;
@@ -15,11 +18,13 @@ namespace builder_mgmt_server.Models
     {
         public IDbOperations DB;
         public UserModel UModel;
+        public ProjectModel PModel;
 
-        public AccountModel(IDbOperations db, IUserModel userModel)
+        public AccountModel(IDbOperations db, IUserModel userModel, IProjectModel projectModel)
         {
             DB = db;
             UModel = (UserModel)userModel;
+            PModel = (ProjectModel)projectModel;
         }
 
         public async Task<string> AddNewAccountAsync(NewAccountDO user)
@@ -48,8 +53,14 @@ namespace builder_mgmt_server.Models
 
             await DB.SaveAsync(ue);
 
-            var tempWorkloadData = TempData.GetTempWorkloadData(userId);
-            await DB.SaveManyAsync(tempWorkloadData);
+            var today = DateTime.UtcNow;
+
+            var tempTasksData = TempData.GetTasks(userId, today.Month, today.Year);
+            await DB.SaveManyAsync(tempTasksData);
+
+            await PModel.CreateAsync("Stavba Líbezice Lánská", userId);
+            await PModel.CreateAsync("Nový dům na Hybernské", userId);
+            await PModel.CreateAsync("Tačící dům", userId);
 
             return userId.ToString();
         }

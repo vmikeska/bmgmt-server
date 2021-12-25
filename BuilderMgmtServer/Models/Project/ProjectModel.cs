@@ -26,13 +26,13 @@ namespace builder_mgmt_server.Models.Tasks
         }
 
 
-        public async Task<ProjectEntity> CreateFromRequestAsync(ProjectResponse req)
+        public async Task<ProjectEntity> CreateAsync(string name, ObjectId ownerId)
         {
             var e = new ProjectEntity()
             {
                 id = ObjectId.GenerateNewId(),
-                owner_id = UserIdSvc.IdObj,
-                name = req.name,
+                owner_id = ownerId,
+                name = name,
             };
 
             var res = await DB.SaveAsync(e);

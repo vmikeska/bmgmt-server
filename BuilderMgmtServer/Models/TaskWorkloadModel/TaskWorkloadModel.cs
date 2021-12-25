@@ -162,6 +162,11 @@ namespace builder_mgmt_server.Models
                 {
                     var week = Weeks.Find(w => w.Year == item.year && w.No == item.week);
 
+                    if (week == null)
+                    {
+                        continue;
+                    }
+
                     var oneDayHours = totalHours / WeekUsedDaysCount;
 
                     foreach (var day in week.Days)
@@ -186,6 +191,11 @@ namespace builder_mgmt_server.Models
                     var month = Months.Find(w => w.Year == item.year && w.No == item.month);
 
                     var usedDaysCount = TaskCommonUtils.UsedDaysInPeriod(UseDays, month.Days.First().Date, month.Days.Last().Date);
+                    if (usedDaysCount == 0)
+                    {
+                        continue;
+                    }
+
                     var oneDayHours = totalHours / usedDaysCount;
 
                     foreach (var day in month.Days)
@@ -200,8 +210,7 @@ namespace builder_mgmt_server.Models
                             };
                             day.Loads.Add(load);
                         }
-                    }
-
+                    }                                        
                 }
             }
         }

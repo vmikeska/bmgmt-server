@@ -73,7 +73,7 @@ namespace builder_mgmt_server.Controllers
         [AuthorizeApi]
         public async Task<ApiResult> Create([FromBody] ProjectResponse req)
         {
-            var e = await ProjModel.CreateFromRequestAsync(req);
+            var e = await ProjModel.CreateAsync(req.name, UserIdObj);
             return ResponseHelper.Successful(e.id.ToString());
         }
 
