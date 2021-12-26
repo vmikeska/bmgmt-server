@@ -1,4 +1,5 @@
-﻿using builder_mgmt_server.Database;
+﻿using builder_mgmt_server.Controllers.User;
+using builder_mgmt_server.Database;
 using builder_mgmt_server.DOs;
 using builder_mgmt_server.Entities;
 using builder_mgmt_server.Mappings;
@@ -107,12 +108,45 @@ namespace builder_mgmt_server.Controllers
         }
 
 
-        [HttpPut]
-        [AuthorizeApi]
-        public async Task<ApiResult> Update([FromBody] ProjectResponse req)
+        //[HttpPut]
+        //[AuthorizeApi]
+        //public async Task<ApiResult> Update([FromBody] ProjectResponse req)
+        //{
+        //    var e = await ProjModel.UpdateFromRequestAsync(req);
+        //    return ResponseHelper.Successful(e.id.ToString());
+        //}
+
+        private Object GetPropUpdateValue(string item, string value)
         {
-            var e = await ProjModel.UpdateFromRequestAsync(req);
-            return ResponseHelper.Successful(e.id.ToString());
+            if (item == "location")
+            {
+                var prms = value.Split("||");
+                var c1 = double.Parse(prms[1]);
+                var c2 = double.Parse(prms[2]);
+
+                return new LocationSE()
+                {
+                    text = prms[0],
+                    coords = new List<double>() { c1, c2 }
+                };
+            }
+
+            return value;
+        }
+
+        [HttpPut("prop")]
+        [AuthorizeApi]
+        public async Task<ApiResult> UpdateItem([FromBody] UpdatePropRequest req)
+        {
+            var value = GetPropUpdateValue(req.item, req.value);
+
+            var pid = new ObjectId(req.id);
+            var filter = DB.F<ProjectEntity>().Eq(p => p.id, pid);
+            var update = DB.U<ProjectEntity>().Set(req.item, value);
+            var res = await DB.UpdateAsync(filter, update);
+            var successful = res.MatchedCount == 1;
+
+            return ResponseHelper.Successful(successful);
         }
 
         //-----

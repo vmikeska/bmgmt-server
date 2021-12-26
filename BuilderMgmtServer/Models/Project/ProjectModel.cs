@@ -39,24 +39,24 @@ namespace builder_mgmt_server.Models.Tasks
             return res;
         }
 
-        public async Task<ProjectEntity> UpdateFromRequestAsync(ProjectResponse req)
-        {
-            var id = new ObjectId(req.id);
+        //public async Task<ProjectEntity> UpdateFromRequestAsync(ProjectResponse req)
+        //{
+        //    var id = new ObjectId(req.id);
 
-            var oldProj = DB.FOD<ProjectEntity>(p => p.id == id);
+        //    var oldProj = DB.FOD<ProjectEntity>(p => p.id == id);
 
-            var e = new ProjectEntity()
-            {
-                id = oldProj.id,
-                owner_id = oldProj.owner_id,
+        //    var e = new ProjectEntity()
+        //    {
+        //        id = oldProj.id,
+        //        owner_id = oldProj.owner_id,
 
-                name = req.name,
-                desc = req.desc
-            };
+        //        name = req.name,
+        //        desc = req.desc
+        //    };
 
-            var res = await DB.ReplaceOneAsync(e);
-            return e;
-        }
+        //    var res = await DB.ReplaceOneAsync(e);
+        //    return e;
+        //}
 
         public async Task<ProjectsTaskEntity> AddTaskToProjectAsync(ObjectId taskId, ObjectId projId)
         {

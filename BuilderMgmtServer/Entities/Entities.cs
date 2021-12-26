@@ -14,6 +14,8 @@ namespace builder_mgmt_server.Entities
         public string name { get; set; }
         public string desc { get; set; }
         public ObjectId owner_id { get; set; }
+
+        public LocationSE location { get; set; }
     }
 
     public class AccountEntity : EntityBase
@@ -81,6 +83,8 @@ namespace builder_mgmt_server.Entities
         public int wid { get; set; }
         public int manHours { get; set; }
         public int manDays { get; set; }
+
+        public LocationSE location { get; set; }
 
         public ObjectId owner_id { get; set; }
 

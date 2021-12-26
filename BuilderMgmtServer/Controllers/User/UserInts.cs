@@ -20,6 +20,7 @@ namespace builder_mgmt_server.Controllers.User
 
     public class UpdatePropRequest
     {
+        public string id { get; set; }
         public string item { get; set; }
         public string value { get; set; }
     }
