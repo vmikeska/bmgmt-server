@@ -9,15 +9,6 @@ using System.Threading.Tasks;
 
 namespace builder_mgmt_server.Entities
 {
-    public class ProjectEntity : EntityBase
-    {
-        public string name { get; set; }
-        public string desc { get; set; }
-        public ObjectId owner_id { get; set; }
-
-        public LocationSE location { get; set; }
-    }
-
     public class AccountEntity : EntityBase
     {
         public ObjectId user_id { get; set; }
@@ -69,13 +60,26 @@ namespace builder_mgmt_server.Entities
         public string name { get; set; }
     }
 
-    public class TaskEntity : EntityBase
+    public class SearchableEntity : EntityBase
     {
         public string name { get; set; }
+        public string desc { get; set; }
+        public ObjectId owner_id { get; set; }
+        public bool finished { get; set; }
+    }
+
+    public class ProjectEntity : SearchableEntity
+    {
+        public LocationSE location { get; set; }
+    }
+
+    public class TaskEntity : SearchableEntity
+    {
+        
         public DateTime? dateFrom { get; set; }
         public DateTime? dateTo { get; set; }
         public TaskTypeEnum type { get; set; }
-        public string desc { get; set; }
+        
         public int week { get; set; }
         public int year { get; set; }
         public int month { get; set; }
@@ -85,8 +89,6 @@ namespace builder_mgmt_server.Entities
         public int manDays { get; set; }
 
         public LocationSE location { get; set; }
-
-        public ObjectId owner_id { get; set; }
 
     }
 
